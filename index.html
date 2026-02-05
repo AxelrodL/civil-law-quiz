@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>民事訴訟法 核心強化系統 (自動記憶進度版)</title>
+    <title>民事訴訟法 核心強化系統 (離線版)</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -221,28 +221,35 @@
 
 <script src="questions_data.js"></script>
 <script>
-    // --- 核心變數 ---
+    // --- 1. Service Worker 註冊 (啟動離線功能) ---
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./service-worker.js')
+                .then(reg => console.log('Service Worker 註冊成功:', reg.scope))
+                .catch(err => console.log('Service Worker 註冊失敗:', err));
+        });
+    }
+
+    // --- 2. 核心邏輯 ---
     let displayList = [], currentDisplayIndex = 0, userAnswers = [], wrongIndices = [], starredIndices = [];
-    let savedLastIndex = 0; // 新增：用來暫存讀取到的進度
+    let savedLastIndex = 0; // 暫存上次讀到的頁碼
     let state = { isRandom: false, isMock: false, isReview: false, isStarMode: false, isSubmitted: false, filterText: "", filterCategory: "" };
 
     window.onload = function() {
         if (typeof questions === 'undefined') { alert("找不到題庫檔案 questions_data.js"); return; }
         
-        initTheme(); // 載入深色模式
-        loadProgress(); // 載入進度 (包含上次讀到哪一題)
+        initTheme(); // 載入主題
+        loadProgress(); // 載入進度
         
         if(userAnswers.length === 0) userAnswers = new Array(questions.length).fill(null);
         initCategories();
         
-        // 建立列表
         applyFilters(); 
         
-        // 關鍵修正：如果剛載入且有存檔進度，強制跳轉到該題
-        // (前提是沒有開啟隨機模式，不然跳轉會很奇怪)
+        // 自動跳轉回上次的題目 (若是隨機模式則不跳轉)
         if (savedLastIndex > 0 && savedLastIndex < displayList.length && !state.isRandom) {
             currentDisplayIndex = savedLastIndex;
-            renderQuestion(); // 重新渲染以更新畫面
+            renderQuestion();
         }
     };
 
@@ -267,7 +274,7 @@
             ans: userAnswers, 
             wrongs: wrongIndices, 
             stars: starredIndices, 
-            lastIdx: currentDisplayIndex, // 這裡有存，所以我們能讀回來
+            lastIdx: currentDisplayIndex, 
             timestamp: new Date().getTime() 
         };
         localStorage.setItem('civ_law_backup_save', JSON.stringify(data));
@@ -282,7 +289,7 @@
                 if(d.ans && d.ans.length === questions.length) userAnswers = d.ans;
                 if(d.wrongs) wrongIndices = d.wrongs;
                 if(d.stars) starredIndices = d.stars;
-                if(d.lastIdx !== undefined) savedLastIndex = d.lastIdx; // 讀取上次的頁碼
+                if(d.lastIdx !== undefined) savedLastIndex = d.lastIdx;
             } catch(e) { console.error("讀取失敗", e); }
         }
     }
@@ -307,7 +314,6 @@
                     if(d.ans) userAnswers = d.ans;
                     if(d.wrongs) wrongIndices = d.wrongs;
                     if(d.stars) starredIndices = d.stars;
-                    // 匯入時不強制跳轉，讓使用者從頭開始或手動跳，避免混亂
                     saveProgress(); applyFilters(); alert("匯入成功！");
                 }
             } catch (err) { alert("檔案格式錯誤"); }
@@ -368,7 +374,6 @@
 
         if (state.isRandom) shuffleArray(displayList); else displayList.sort((a, b) => a - b);
         
-        // 注意：這裡我們通常重置為 0，但在 window.onload 我們會覆蓋它
         currentDisplayIndex = 0; 
         
         if (state.isMock) { state.isSubmitted = false; document.getElementById('score-display').style.display = 'none'; document.getElementById('btn-submit').style.display = 'inline-block'; }
