@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>民事訴訟法 核心強化系統 (完整版+備份)</title>
+    <title>民事訴訟法 核心強化系統 (UI優化版)</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -26,23 +26,10 @@
 
         .container { max-width: 800px; margin: 0 auto; }
 
-        /* 1. 儀表板 */
-        .dashboard-grid {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;
-        }
-        .stat-box {
-            background: var(--card); padding: 10px 15px; border-radius: 12px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; flex-direction: column; justify-content: center;
-        }
-        .stat-label { font-size: 12px; color: var(--muted); }
-        .stat-value { font-size: 18px; font-weight: 700; color: var(--primary); }
-        .progress-container { height: 6px; background: #e0e0e0; border-radius: 3px; margin-top: 5px; overflow: hidden; }
-        .progress-fill { height: 100%; background: var(--success); width: 0%; transition: width 0.3s ease; }
-
-        /* 2. 控制面板 */
+        /* 控制面板 (最上方) */
         .control-panel {
             background: var(--card); padding: 15px; border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 10px;
             display: flex; flex-direction: column; gap: 10px;
         }
         .search-row { display: flex; gap: 8px; }
@@ -58,13 +45,25 @@
         .toggle-btn.mock-active { background: var(--error); border-color: var(--error); color: white; }
         .toggle-btn.star-active { background: var(--highlight); border-color: var(--highlight); color: #fff; text-shadow: 0 1px 1px rgba(0,0,0,0.2); }
 
-        /* 3. 題目卡片 */
+        /* 儀表板 (移到中間) */
+        .dashboard-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;
+        }
+        .stat-box {
+            background: var(--card); padding: 10px 15px; border-radius: 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; flex-direction: column; justify-content: center;
+        }
+        .stat-label { font-size: 12px; color: var(--muted); }
+        .stat-value { font-size: 18px; font-weight: 700; color: var(--primary); }
+        .progress-container { height: 6px; background: #e0e0e0; border-radius: 3px; margin-top: 5px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--success); width: 0%; transition: width 0.3s ease; }
+
+        /* 題目卡片 */
         .quiz-card {
             background: var(--card); border-radius: 16px; padding: 25px;
             box-shadow: 0 8px 20px rgba(0,0,0,0.08); min-height: 400px; position: relative;
         }
         
-        /* 收藏按鈕樣式 */
         .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
         .meta-info { color: var(--muted); font-size: 0.9em; }
         .tag { background: #eee; padding: 2px 8px; border-radius: 4px; font-size: 0.85em; margin-right: 5px; }
@@ -98,7 +97,7 @@
         .feedback-area { margin-top: 25px; padding: 20px; border-radius: 8px; background: #f8f9fa; border-left: 5px solid var(--primary); display: none; }
         .feedback-area.show { display: block; animation: fadeIn 0.3s; }
         
-        /* 4. 底部導航 */
+        /* 底部導航 */
         .nav-bar {
             display: flex; justify-content: space-between; align-items: center; margin-top: 20px;
             background: var(--card); padding: 15px; border-radius: 12px; box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
@@ -108,7 +107,7 @@
             border-radius: 8px; cursor: pointer; font-weight: 500; font-size: 16px;
         }
 
-        /* 5. 數據備份區塊 */
+        /* 數據備份區塊 */
         .backup-section {
             margin-top: 30px; padding: 20px; background: #e8eaed; border-radius: 12px; text-align: center;
         }
@@ -126,22 +125,6 @@
 
 <div class="container">
     
-    <div class="dashboard-grid">
-        <div class="stat-box">
-            <span class="stat-label">正確率</span>
-            <span class="stat-value" id="accuracy-text">0%</span>
-        </div>
-        <div class="stat-box">
-            <div style="display:flex; justify-content:space-between;">
-                <span class="stat-label">當前進度</span>
-                <span class="stat-label" id="progress-text">0/0</span>
-            </div>
-            <div class="progress-container">
-                <div class="progress-fill" id="progress-bar"></div>
-            </div>
-        </div>
-    </div>
-
     <div class="control-panel">
         <div class="search-row">
             <input type="text" id="search-input" placeholder="🔍 搜尋關鍵字..." oninput="debounceSearch()">
@@ -156,6 +139,22 @@
             <button class="toggle-btn" id="btn-mock" onclick="toggleMock()">📝 模擬考</button>
             <button class="toggle-btn" id="btn-review" onclick="toggleReview()">🔥 錯題(<span id="wrong-count">0</span>)</button>
             <button class="toggle-btn" id="btn-star" onclick="toggleStarMode()">⭐ 收藏(<span id="star-count">0</span>)</button>
+        </div>
+    </div>
+
+    <div class="dashboard-grid">
+        <div class="stat-box">
+            <span class="stat-label">正確率</span>
+            <span class="stat-value" id="accuracy-text">0%</span>
+        </div>
+        <div class="stat-box">
+            <div style="display:flex; justify-content:space-between;">
+                <span class="stat-label">當前進度</span>
+                <span class="stat-label" id="progress-text">0/0</span>
+            </div>
+            <div class="progress-container">
+                <div class="progress-fill" id="progress-bar"></div>
+            </div>
         </div>
     </div>
 
@@ -193,7 +192,7 @@
     <div class="backup-section">
         <div class="backup-title">⚙️ 數據安全管理</div>
         <div class="backup-btn-group">
-            <button class="backup-btn" onclick="exportData()">💾 匯出進度備份</button>
+            <button class="backup-btn" onclick="exportData()">💾 匯出進度</button>
             <button class="backup-btn" onclick="document.getElementById('import-file').click()">📂 匯入進度</button>
             <input type="file" id="import-file" style="display:none" onchange="importData(this)" accept=".json">
         </div>
@@ -202,40 +201,20 @@
 
 <script src="questions_data.js"></script>
 <script>
-    // --- 核心變數 ---
-    let displayList = [];
-    let currentDisplayIndex = 0;
-    let userAnswers = []; // 用戶答案
-    let wrongIndices = []; // 錯題
-    let starredIndices = []; // 收藏題 (新增)
-    
-    let state = {
-        isRandom: false,
-        isMock: false,
-        isReview: false,
-        isStarMode: false, // 新增：是否只看星星
-        isSubmitted: false,
-        filterText: "",
-        filterCategory: ""
-    };
+    // --- JS 邏輯完全保留不變 ---
+    let displayList = [], currentDisplayIndex = 0, userAnswers = [], wrongIndices = [], starredIndices = [];
+    let state = { isRandom: false, isMock: false, isReview: false, isStarMode: false, isSubmitted: false, filterText: "", filterCategory: "" };
 
     window.onload = function() {
         if (typeof questions === 'undefined') { alert("找不到題庫檔案 questions_data.js"); return; }
-        loadProgress(); // 讀取進度
+        loadProgress();
         if(userAnswers.length === 0) userAnswers = new Array(questions.length).fill(null);
         initCategories();
         applyFilters();
     };
 
-    // --- 資料存取 (含備份功能) ---
     function saveProgress() {
-        const data = { 
-            ans: userAnswers, 
-            wrongs: wrongIndices, 
-            stars: starredIndices, // 存星星
-            lastIdx: currentDisplayIndex,
-            timestamp: new Date().getTime()
-        };
+        const data = { ans: userAnswers, wrongs: wrongIndices, stars: starredIndices, lastIdx: currentDisplayIndex, timestamp: new Date().getTime() };
         localStorage.setItem('civ_law_backup_save', JSON.stringify(data));
         updateStats(); 
     }
@@ -247,26 +226,20 @@
                 const d = JSON.parse(saved);
                 if(d.ans && d.ans.length === questions.length) userAnswers = d.ans;
                 if(d.wrongs) wrongIndices = d.wrongs;
-                if(d.stars) starredIndices = d.stars; // 讀星星
+                if(d.stars) starredIndices = d.stars;
             } catch(e) { console.error("讀取失敗", e); }
         }
     }
 
-    // 匯出功能
     function exportData() {
-        const data = { 
-            ans: userAnswers, wrongs: wrongIndices, stars: starredIndices, 
-            date: new Date().toLocaleString() 
-        };
+        const data = { ans: userAnswers, wrongs: wrongIndices, stars: starredIndices, date: new Date().toLocaleString() };
         const blob = new Blob([JSON.stringify(data)], {type: "application/json"});
         const a = document.createElement("a");
         a.href = URL.createObjectURL(blob);
         a.download = `民訴題庫進度_${new Date().toISOString().slice(0,10)}.json`;
         a.click();
-        alert("備份檔案已下載！請妥善保存。");
     }
 
-    // 匯入功能
     function importData(input) {
         const file = input.files[0];
         if (!file) return;
@@ -274,53 +247,33 @@
         reader.onload = function(e) {
             try {
                 const d = JSON.parse(e.target.result);
-                if (confirm(`確定要匯入備份嗎？\n備份日期: ${d.date || '未知'}\n這將覆蓋目前的進度！`)) {
+                if (confirm(`確定要匯入備份嗎？\n備份日期: ${d.date || '未知'}`)) {
                     if(d.ans) userAnswers = d.ans;
                     if(d.wrongs) wrongIndices = d.wrongs;
                     if(d.stars) starredIndices = d.stars;
-                    saveProgress();
-                    applyFilters();
-                    alert("匯入成功！");
+                    saveProgress(); applyFilters(); alert("匯入成功！");
                 }
-            } catch (err) { alert("檔案格式錯誤，請確認這是本系統匯出的 JSON 檔。"); }
+            } catch (err) { alert("檔案格式錯誤"); }
         };
-        reader.readAsText(file);
-        input.value = ''; // 重置 input 以便重複選擇同檔
+        reader.readAsText(file); input.value = '';
     }
 
-    // --- 收藏功能邏輯 ---
     function toggleCurrentStar() {
         if (displayList.length === 0) return;
         const realIdx = displayList[currentDisplayIndex];
         const starIdx = starredIndices.indexOf(realIdx);
-        
-        if (starIdx === -1) {
-            starredIndices.push(realIdx); // 加入
-        } else {
-            starredIndices.splice(starIdx, 1); // 移除
-        }
-        
-        saveProgress();
-        renderQuestion(); // 重繪以更新星星狀態
-        
-        // 如果目前正在「只看收藏」模式，且取消了收藏，是否要跳下一題？
-        // 為了體驗平順，建議留在當下，但下次重整清單會消失。
+        if (starIdx === -1) starredIndices.push(realIdx); else starredIndices.splice(starIdx, 1);
+        saveProgress(); renderQuestion();
     }
 
     function toggleStarMode() {
-        if (starredIndices.length === 0) { alert("目前沒有收藏任何題目！\n請先點擊題目卡右上角的星星。"); return; }
+        if (starredIndices.length === 0) { alert("目前沒有收藏任何題目！"); return; }
         state.isStarMode = !state.isStarMode;
         document.getElementById('btn-star').classList.toggle('star-active');
-        
-        // 互斥邏輯：如果開啟收藏，關閉錯題/模擬
-        if (state.isStarMode) {
-            state.isReview = false; document.getElementById('btn-review').classList.remove('active');
-            state.isMock = false; document.getElementById('btn-mock').classList.remove('mock-active');
-        }
+        if (state.isStarMode) { state.isReview = false; state.isMock = false; resetToggleUI(); }
         applyFilters();
     }
 
-    // --- 介面與核心邏輯 ---
     function updateStats() {
         let totalAnswered = 0, totalCorrect = 0;
         userAnswers.forEach((ans, i) => {
@@ -332,9 +285,8 @@
         document.getElementById('progress-text').innerText = `${currentDisplayIndex + 1} / ${displayList.length}`;
         const pct = displayList.length > 0 ? ((currentDisplayIndex + 1) / displayList.length) * 100 : 0;
         document.getElementById('progress-bar').style.width = `${pct}%`;
-
         document.getElementById('wrong-count').innerText = wrongIndices.length;
-        document.getElementById('star-count').innerText = starredIndices.length; // 更新星星數
+        document.getElementById('star-count').innerText = starredIndices.length;
     }
 
     function initCategories() {
@@ -346,10 +298,9 @@
     }
 
     function applyFilters() {
-        // 決定基礎池
         let basePool = questions.map((_, i) => i);
         if (state.isReview) basePool = wrongIndices;
-        else if (state.isStarMode) basePool = starredIndices; // 優先級：星星 > 錯題 > 全部
+        else if (state.isStarMode) basePool = starredIndices;
 
         displayList = basePool.filter(index => {
             const q = questions[index];
@@ -358,22 +309,14 @@
             return matchCat && matchText;
         });
 
-        if (state.isRandom) shuffleArray(displayList);
-        else displayList.sort((a, b) => a - b);
-
+        if (state.isRandom) shuffleArray(displayList); else displayList.sort((a, b) => a - b);
         currentDisplayIndex = 0;
-        if (state.isMock) {
-            state.isSubmitted = false;
-            document.getElementById('score-display').style.display = 'none';
-            document.getElementById('btn-submit').style.display = 'inline-block';
-        }
-        renderQuestion();
-        updateStats();
+        if (state.isMock) { state.isSubmitted = false; document.getElementById('score-display').style.display = 'none'; document.getElementById('btn-submit').style.display = 'inline-block'; }
+        renderQuestion(); updateStats();
     }
 
     function renderQuestion() {
         if (displayList.length === 0) { document.getElementById('q-text').innerText = "查無題目"; return; }
-        
         const realIndex = displayList[currentDisplayIndex];
         const qData = questions[realIndex];
         const myAnswer = userAnswers[realIndex];
@@ -382,24 +325,19 @@
         document.getElementById('q-real-id').innerText = qData.id || (realIndex + 1);
         document.getElementById('q-text').innerText = qData.q;
 
-        // 渲染星星狀態
         const starBtn = document.getElementById('btn-star-card');
         const isStarred = starredIndices.includes(realIndex);
         starBtn.innerText = isStarred ? "★" : "☆";
         starBtn.className = isStarred ? "star-btn active" : "star-btn";
 
-        // 提示與選項
-        const hintBox = document.getElementById('hint-box');
-        const hintBtn = document.getElementById('btn-hint');
+        const hintBox = document.getElementById('hint-box'), hintBtn = document.getElementById('btn-hint');
         hintBox.style.display = 'none'; hintBox.innerText = qData.h || "本題無提示";
         hintBtn.style.display = qData.h ? 'inline-block' : 'none';
 
         const optsDiv = document.getElementById('options-area'); optsDiv.innerHTML = "";
         qData.o.forEach((optText, i) => {
             const btn = document.createElement('button');
-            btn.className = 'option-btn';
-            btn.innerText = optText;
-            
+            btn.className = 'option-btn'; btn.innerText = optText;
             if (state.isMock && !state.isSubmitted) {
                 if (myAnswer === i) btn.classList.add('selected-mock');
                 btn.onclick = () => { userAnswers[realIndex] = i; renderQuestion(); };
@@ -416,75 +354,49 @@
 
         const showExp = (!state.isMock && myAnswer !== null) || (state.isMock && state.isSubmitted);
         const fbArea = document.getElementById('feedback-area');
-        if (showExp) {
-            document.getElementById('q-exp').innerText = qData.e || "暫無詳細解析";
-            fbArea.classList.add('show'); hintBtn.style.display = 'none';
-        } else fbArea.classList.remove('show');
-
+        if (showExp) { document.getElementById('q-exp').innerText = qData.e || "暫無詳細解析"; fbArea.classList.add('show'); hintBtn.style.display = 'none'; } 
+        else fbArea.classList.remove('show');
         updateStats();
     }
 
     function handleAnswer(qIdx, ansIdx) {
         userAnswers[qIdx] = ansIdx;
-        if (ansIdx !== questions[qIdx].a) {
-            if (!wrongIndices.includes(qIdx)) wrongIndices.push(qIdx);
-        } else {
-            const wIdx = wrongIndices.indexOf(qIdx);
-            if (wIdx > -1) wrongIndices.splice(wIdx, 1);
-        }
+        if (ansIdx !== questions[qIdx].a) { if (!wrongIndices.includes(qIdx)) wrongIndices.push(qIdx); } 
+        else { const wIdx = wrongIndices.indexOf(qIdx); if (wIdx > -1) wrongIndices.splice(wIdx, 1); }
         saveProgress(); renderQuestion();
     }
 
-    function toggleHint() {
-        const box = document.getElementById('hint-box');
-        box.style.display = box.style.display === 'none' ? 'block' : 'none';
-    }
-    
-    // --- 導航與功能 ---
+    function toggleHint() { const box = document.getElementById('hint-box'); box.style.display = box.style.display === 'none' ? 'block' : 'none'; }
     function prevQuestion() { if (currentDisplayIndex > 0) { currentDisplayIndex--; renderQuestion(); } }
     function nextQuestion() { if (currentDisplayIndex < displayList.length - 1) { currentDisplayIndex++; renderQuestion(); } }
-
+    
     let debounceTimer;
-    function debounceSearch() {
-        clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(() => {
-            state.filterText = document.getElementById('search-input').value.trim();
-            applyFilters();
-        }, 300);
-    }
-
+    function debounceSearch() { clearTimeout(debounceTimer); debounceTimer = setTimeout(() => { state.filterText = document.getElementById('search-input').value.trim(); applyFilters(); }, 300); }
+    
     function toggleRandom() { state.isRandom = !state.isRandom; document.getElementById('btn-random').classList.toggle('active'); applyFilters(); }
-    
     function toggleReview() { 
-        if (wrongIndices.length === 0) { alert("目前沒有錯題紀錄"); return; }
+        if (wrongIndices.length === 0) { alert("無錯題紀錄"); return; }
         state.isReview = !state.isReview; document.getElementById('btn-review').classList.toggle('active'); 
-        if(state.isReview) { state.isMock = false; state.isStarMode = false; resetToggleUI(); } // 互斥
-        applyFilters(); 
+        if(state.isReview) { state.isMock = false; state.isStarMode = false; resetToggleUI(); } applyFilters(); 
     }
-    
     function toggleMock() { 
         state.isMock = !state.isMock; document.getElementById('btn-mock').classList.toggle('mock-active');
-        if(state.isMock) { state.isReview = false; state.isStarMode = false; resetToggleUI(); } // 互斥
-        applyFilters(); 
+        if(state.isMock) { state.isReview = false; state.isStarMode = false; resetToggleUI(); } applyFilters(); 
     }
-
     function resetToggleUI() {
         document.getElementById('btn-review').classList.toggle('active', state.isReview);
         document.getElementById('btn-star').classList.toggle('star-active', state.isStarMode);
         document.getElementById('btn-mock').classList.toggle('mock-active', state.isMock);
     }
-
     function submitExam() {
         if (!confirm("確定要交卷嗎？")) return;
         state.isSubmitted = true;
-        let correct = 0;
-        displayList.forEach(idx => { if (userAnswers[idx] === questions[idx].a) correct++; });
+        let correct = 0; displayList.forEach(idx => { if (userAnswers[idx] === questions[idx].a) correct++; });
         document.getElementById('score-display').innerText = `本次得分: ${Math.round((correct/displayList.length)*100)}`;
         document.getElementById('score-display').style.display = 'inline-block';
         document.getElementById('btn-submit').style.display = 'none';
         renderQuestion();
     }
-
     function shuffleArray(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } }
 </script>
 </body>
