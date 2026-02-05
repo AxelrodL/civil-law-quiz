@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>民事訴訟法 核心強化系統 (離線版)</title>
+    <title>民事訴訟法 核心強化系統 (最終修復版)</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -361,6 +361,9 @@
     }
 
     function applyFilters() {
+        // [修復] 讀取下拉選單的值
+        state.filterCategory = document.getElementById('category-filter').value;
+
         let basePool = questions.map((_, i) => i);
         if (state.isReview) basePool = wrongIndices;
         else if (state.isStarMode) basePool = starredIndices;
@@ -374,6 +377,7 @@
 
         if (state.isRandom) shuffleArray(displayList); else displayList.sort((a, b) => a - b);
         
+        // 預設重置為0 (如果不是剛載入的自動跳轉，使用者切換條件時應回到第一題)
         currentDisplayIndex = 0; 
         
         if (state.isMock) { state.isSubmitted = false; document.getElementById('score-display').style.display = 'none'; document.getElementById('btn-submit').style.display = 'inline-block'; }
