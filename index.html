@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>民事訴訟法 核心強化系統 (夜間護眼版)</title>
+    <title>民事訴訟法 核心強化系統 (自動記憶進度版)</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -13,47 +13,25 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* --- CSS 變數系統 (支援深色模式切換) --- */
+        /* --- CSS 變數系統 --- */
         :root {
-            /* 預設亮色主題 (Day Mode) */
-            --primary: #2C3E50;      
-            --secondary: #34495e;    
-            --bg: #f0f2f5;           
-            --card: #FFFFFF;         
-            --text: #2c3e50;         
-            --muted: #7f8c8d;        
-            --success: #27ae60;      
-            --error: #c0392b;        
-            --highlight: #f1c40f;
-            --accent: #3498db;
-            --input-bg: #ffffff;
-            --border: #ddd;
-            --option-bg: #ffffff;
-            --option-border: #e0e0e0;
-            --hint-bg: #fff3cd;
-            --hint-text: #856404;
-            --exp-bg: #f8f9fa;
+            /* 預設亮色主題 */
+            --primary: #2C3E50;      --secondary: #34495e;    --bg: #f0f2f5;           
+            --card: #FFFFFF;         --text: #2c3e50;         --muted: #7f8c8d;        
+            --success: #27ae60;      --error: #c0392b;        --highlight: #f1c40f;
+            --accent: #3498db;       --input-bg: #ffffff;     --border: #ddd;
+            --option-bg: #ffffff;    --option-border: #e0e0e0;
+            --hint-bg: #fff3cd;      --hint-text: #856404;    --exp-bg: #f8f9fa;
         }
 
-        /* 深色主題 (Night Mode) */
+        /* 深色主題 */
         body.dark-mode {
-            --primary: #ecf0f1;       /* 標題變亮白 */
-            --secondary: #bdc3c7;     /* 次要文字變銀灰 */
-            --bg: #121212;            /* 背景極深灰 */
-            --card: #1e1e1e;          /* 卡片深灰 */
-            --text: #e0e0e0;          /* 內文柔白 */
-            --muted: #a0a0a0;         
-            --success: #2ecc71;       /* 綠色調亮一點以利閱讀 */
-            --error: #e74c3c;         /* 紅色調亮 */
-            --highlight: #f1c40f;     
-            --accent: #3498db;
-            --input-bg: #2c2c2c;      /* 輸入框變深 */
-            --border: #444;
-            --option-bg: #2c2c2c;     /* 選項按鈕變深 */
-            --option-border: #444;
-            --hint-bg: #4a3b00;       /* 提示框變暗黃 */
-            --hint-text: #ffebb5;     /* 提示字變亮黃 */
-            --exp-bg: #252525;        /* 解析區塊變深 */
+            --primary: #ecf0f1;       --secondary: #bdc3c7;     --bg: #121212;            
+            --card: #1e1e1e;          --text: #e0e0e0;          --muted: #a0a0a0;         
+            --success: #2ecc71;       --error: #e74c3c;         --highlight: #f1c40f;     
+            --accent: #3498db;        --input-bg: #2c2c2c;      --border: #444;
+            --option-bg: #2c2c2c;     --option-border: #444;
+            --hint-bg: #4a3b00;       --hint-text: #ffebb5;     --exp-bg: #252525;        
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; transition: background-color 0.3s, color 0.3s; }
@@ -78,17 +56,15 @@
         }
         
         .mode-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 2px; }
-        
         .toggle-btn {
             padding: 6px 14px; border: 1px solid var(--primary); background: transparent;
             color: var(--primary); border-radius: 20px; cursor: pointer; font-size: 13px;
             white-space: nowrap; transition: all 0.2s;
         }
-        .toggle-btn.active { background: var(--primary); color: var(--bg); /* 反轉顏色 */ }
+        .toggle-btn.active { background: var(--primary); color: var(--bg); }
         .toggle-btn.mock-active { background: var(--error); border-color: var(--error); color: white; }
         .toggle-btn.star-active { background: var(--highlight); border-color: var(--highlight); color: #fff; text-shadow: 0 1px 1px rgba(0,0,0,0.2); }
         
-        /* 深色模式切換按鈕 */
         .theme-btn {
             background: var(--card); border: 1px solid var(--border); color: var(--text);
             padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 16px;
@@ -112,14 +88,10 @@
             background: var(--card); border-radius: 16px; padding: 25px;
             box-shadow: 0 8px 20px rgba(0,0,0,0.08); min-height: 400px; position: relative;
         }
-        
         .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
         .meta-info { color: var(--muted); font-size: 0.9em; }
         .tag { background: var(--border); padding: 2px 8px; border-radius: 4px; font-size: 0.85em; margin-right: 5px; color: var(--text); }
-        
-        .star-btn {
-            background: none; border: none; font-size: 24px; color: var(--muted); cursor: pointer; padding: 0 5px; line-height: 1; transition: transform 0.2s;
-        }
+        .star-btn { background: none; border: none; font-size: 24px; color: var(--muted); cursor: pointer; padding: 0 5px; line-height: 1; transition: transform 0.2s; }
         .star-btn.active { color: var(--highlight); transform: scale(1.2); }
 
         .question-text { font-size: 1.3em; font-weight: 600; margin-bottom: 20px; color: var(--primary); }
@@ -140,7 +112,6 @@
         }
         .option-btn:active { transform: scale(0.98); }
         .option-btn:hover:not(:disabled) { border-color: var(--primary); }
-        
         .option-btn.correct { border-color: var(--success); background: rgba(39, 174, 96, 0.1); color: var(--success); font-weight: bold; }
         .option-btn.wrong { border-color: var(--error); background: rgba(192, 57, 43, 0.1); color: var(--error); }
         .option-btn.selected-mock { border-color: var(--accent); background: rgba(52, 152, 219, 0.1); }
@@ -159,15 +130,10 @@
         }
 
         /* 5. 數據備份 */
-        .backup-section {
-            margin-top: 30px; padding: 20px; background: var(--border); border-radius: 12px; text-align: center;
-        }
+        .backup-section { margin-top: 30px; padding: 20px; background: var(--border); border-radius: 12px; text-align: center; }
         .backup-title { font-size: 14px; color: var(--muted); margin-bottom: 10px; font-weight: bold; }
         .backup-btn-group { display: flex; gap: 10px; justify-content: center; }
-        .backup-btn {
-            padding: 8px 16px; border: 1px solid var(--muted); border-radius: 6px; background: var(--card);
-            color: var(--text); cursor: pointer; font-size: 14px;
-        }
+        .backup-btn { padding: 8px 16px; border: 1px solid var(--muted); border-radius: 6px; background: var(--card); color: var(--text); cursor: pointer; font-size: 14px; }
         
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
     </style>
@@ -183,13 +149,11 @@
             </div>
             <button class="theme-btn" id="theme-toggle" onclick="toggleTheme()">🌙</button>
         </div>
-        
         <div class="search-row">
             <select id="category-filter" onchange="applyFilters()">
                 <option value="">📂 所有章節</option>
             </select>
         </div>
-        
         <div class="mode-row">
             <button class="toggle-btn" id="btn-random" onclick="toggleRandom()">🎲 隨機</button>
             <button class="toggle-btn" id="btn-mock" onclick="toggleMock()">📝 模擬考</button>
@@ -259,21 +223,29 @@
 <script>
     // --- 核心變數 ---
     let displayList = [], currentDisplayIndex = 0, userAnswers = [], wrongIndices = [], starredIndices = [];
+    let savedLastIndex = 0; // 新增：用來暫存讀取到的進度
     let state = { isRandom: false, isMock: false, isReview: false, isStarMode: false, isSubmitted: false, filterText: "", filterCategory: "" };
 
     window.onload = function() {
         if (typeof questions === 'undefined') { alert("找不到題庫檔案 questions_data.js"); return; }
         
-        // 載入深色模式設定
-        initTheme();
-
-        loadProgress();
+        initTheme(); // 載入深色模式
+        loadProgress(); // 載入進度 (包含上次讀到哪一題)
+        
         if(userAnswers.length === 0) userAnswers = new Array(questions.length).fill(null);
         initCategories();
-        applyFilters();
+        
+        // 建立列表
+        applyFilters(); 
+        
+        // 關鍵修正：如果剛載入且有存檔進度，強制跳轉到該題
+        // (前提是沒有開啟隨機模式，不然跳轉會很奇怪)
+        if (savedLastIndex > 0 && savedLastIndex < displayList.length && !state.isRandom) {
+            currentDisplayIndex = savedLastIndex;
+            renderQuestion(); // 重新渲染以更新畫面
+        }
     };
 
-    // --- 深色模式邏輯 (新增) ---
     function initTheme() {
         const savedTheme = localStorage.getItem('civ_law_theme');
         if (savedTheme === 'dark') {
@@ -290,9 +262,14 @@
         localStorage.setItem('civ_law_theme', isDark ? 'dark' : 'light');
     }
 
-    // --- 資料存取 ---
     function saveProgress() {
-        const data = { ans: userAnswers, wrongs: wrongIndices, stars: starredIndices, lastIdx: currentDisplayIndex, timestamp: new Date().getTime() };
+        const data = { 
+            ans: userAnswers, 
+            wrongs: wrongIndices, 
+            stars: starredIndices, 
+            lastIdx: currentDisplayIndex, // 這裡有存，所以我們能讀回來
+            timestamp: new Date().getTime() 
+        };
         localStorage.setItem('civ_law_backup_save', JSON.stringify(data));
         updateStats(); 
     }
@@ -305,11 +282,11 @@
                 if(d.ans && d.ans.length === questions.length) userAnswers = d.ans;
                 if(d.wrongs) wrongIndices = d.wrongs;
                 if(d.stars) starredIndices = d.stars;
+                if(d.lastIdx !== undefined) savedLastIndex = d.lastIdx; // 讀取上次的頁碼
             } catch(e) { console.error("讀取失敗", e); }
         }
     }
 
-    // --- 備份功能 ---
     function exportData() {
         const data = { ans: userAnswers, wrongs: wrongIndices, stars: starredIndices, date: new Date().toLocaleString() };
         const blob = new Blob([JSON.stringify(data)], {type: "application/json"});
@@ -330,6 +307,7 @@
                     if(d.ans) userAnswers = d.ans;
                     if(d.wrongs) wrongIndices = d.wrongs;
                     if(d.stars) starredIndices = d.stars;
+                    // 匯入時不強制跳轉，讓使用者從頭開始或手動跳，避免混亂
                     saveProgress(); applyFilters(); alert("匯入成功！");
                 }
             } catch (err) { alert("檔案格式錯誤"); }
@@ -337,7 +315,6 @@
         reader.readAsText(file); input.value = '';
     }
 
-    // --- 星號與過濾功能 ---
     function toggleCurrentStar() {
         if (displayList.length === 0) return;
         const realIdx = displayList[currentDisplayIndex];
@@ -390,7 +367,10 @@
         });
 
         if (state.isRandom) shuffleArray(displayList); else displayList.sort((a, b) => a - b);
-        currentDisplayIndex = 0;
+        
+        // 注意：這裡我們通常重置為 0，但在 window.onload 我們會覆蓋它
+        currentDisplayIndex = 0; 
+        
         if (state.isMock) { state.isSubmitted = false; document.getElementById('score-display').style.display = 'none'; document.getElementById('btn-submit').style.display = 'inline-block'; }
         renderQuestion(); updateStats();
     }
@@ -447,8 +427,12 @@
     }
 
     function toggleHint() { const box = document.getElementById('hint-box'); box.style.display = box.style.display === 'none' ? 'block' : 'none'; }
-    function prevQuestion() { if (currentDisplayIndex > 0) { currentDisplayIndex--; renderQuestion(); } }
-    function nextQuestion() { if (currentDisplayIndex < displayList.length - 1) { currentDisplayIndex++; renderQuestion(); } }
+    function prevQuestion() { 
+        if (currentDisplayIndex > 0) { currentDisplayIndex--; renderQuestion(); saveProgress(); } 
+    }
+    function nextQuestion() { 
+        if (currentDisplayIndex < displayList.length - 1) { currentDisplayIndex++; renderQuestion(); saveProgress(); } 
+    }
     
     let debounceTimer;
     function debounceSearch() { clearTimeout(debounceTimer); debounceTimer = setTimeout(() => { state.filterText = document.getElementById('search-input').value.trim(); applyFilters(); }, 300); }
