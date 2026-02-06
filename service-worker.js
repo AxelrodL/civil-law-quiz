@@ -1,7 +1,7 @@
 // service-worker.js
 
 // 1. 設定快取名稱 (如果要更新題庫，只要修改這裡的版本號，例如 v1 -> v2)
-const CACHE_NAME = 'civil-law-quiz-v3';
+const CACHE_NAME = 'civil-law-quiz-v5';
 
 // 2. 指定要快取的檔案 (這些檔案會被下載到手機裡)
 const ASSETS_TO_CACHE = [
