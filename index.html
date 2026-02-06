@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>民事訴訟法 核心強化系統 (最終修復版)</title>
+    <title>民事訴訟法 核心強化系統 (導入修復版)</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -49,8 +49,9 @@
         }
         .top-row { display: flex; gap: 8px; justify-content: space-between; }
         .search-row { display: flex; gap: 8px; flex-grow: 1; }
+        .jump-row { display: flex; gap: 8px; }
         
-        input[type="text"], select {
+        input[type="text"], input[type="number"], select, textarea {
             padding: 10px; border: 1px solid var(--border); border-radius: 8px; 
             font-size: 16px; width: 100%; background: var(--input-bg); color: var(--text);
         }
@@ -65,10 +66,8 @@
         .toggle-btn.mock-active { background: var(--error); border-color: var(--error); color: white; }
         .toggle-btn.star-active { background: var(--highlight); border-color: var(--highlight); color: #fff; text-shadow: 0 1px 1px rgba(0,0,0,0.2); }
         
-        .theme-btn {
-            background: var(--card); border: 1px solid var(--border); color: var(--text);
-            padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 16px;
-        }
+        .jump-btn { background: var(--secondary); color: white; border: none; border-radius: 8px; padding: 0 15px; cursor: pointer; white-space: nowrap; }
+        .theme-btn { background: var(--card); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 16px; }
 
         /* 2. 儀表板 */
         .dashboard-grid {
@@ -96,14 +95,8 @@
 
         .question-text { font-size: 1.3em; font-weight: 600; margin-bottom: 20px; color: var(--primary); }
         
-        .hint-btn {
-            background: var(--hint-bg); color: var(--hint-text); border: none; padding: 5px 12px;
-            border-radius: 15px; font-size: 0.9em; cursor: pointer; margin-bottom: 15px; display: inline-block;
-        }
-        .hint-box {
-            background: var(--hint-bg); padding: 10px; border-radius: 8px; color: var(--hint-text);
-            margin-bottom: 20px; display: none; font-size: 0.95em;
-        }
+        .hint-btn { background: var(--hint-bg); color: var(--hint-text); border: none; padding: 5px 12px; border-radius: 15px; font-size: 0.9em; cursor: pointer; margin-bottom: 15px; display: inline-block; }
+        .hint-box { background: var(--hint-bg); padding: 10px; border-radius: 8px; color: var(--hint-text); margin-bottom: 20px; display: none; font-size: 0.95em; }
 
         .options-grid { display: grid; gap: 12px; }
         .option-btn {
@@ -124,17 +117,18 @@
             display: flex; justify-content: space-between; align-items: center; margin-top: 20px;
             background: var(--card); padding: 15px; border-radius: 12px; box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
         }
-        .nav-btn {
-            background: var(--primary); color: var(--bg); border: none; padding: 12px 24px;
-            border-radius: 8px; cursor: pointer; font-weight: 500; font-size: 16px;
-        }
+        .nav-btn { background: var(--primary); color: var(--bg); border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: 500; font-size: 16px; }
 
-        /* 5. 數據備份 */
+        /* 5. 數據備份與導入 */
         .backup-section { margin-top: 30px; padding: 20px; background: var(--border); border-radius: 12px; text-align: center; }
         .backup-title { font-size: 14px; color: var(--muted); margin-bottom: 10px; font-weight: bold; }
-        .backup-btn-group { display: flex; gap: 10px; justify-content: center; }
+        .backup-btn-group { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
         .backup-btn { padding: 8px 16px; border: 1px solid var(--muted); border-radius: 6px; background: var(--card); color: var(--text); cursor: pointer; font-size: 14px; }
         
+        /* 開發者導入區 (預設隱藏) */
+        .import-zone { margin-top: 15px; display: none; text-align: left; }
+        .import-zone textarea { width: 100%; height: 150px; font-family: monospace; font-size: 13px; margin-bottom: 10px; }
+
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
@@ -149,11 +143,18 @@
             </div>
             <button class="theme-btn" id="theme-toggle" onclick="toggleTheme()">🌙</button>
         </div>
+        
         <div class="search-row">
             <select id="category-filter" onchange="applyFilters()">
                 <option value="">📂 所有章節</option>
             </select>
         </div>
+
+        <div class="jump-row">
+            <input type="number" id="jump-input" placeholder="輸入題號 (例如 520)">
+            <button class="jump-btn" onclick="jumpToQuestion()">跳轉</button>
+        </div>
+
         <div class="mode-row">
             <button class="toggle-btn" id="btn-random" onclick="toggleRandom()">🎲 隨機</button>
             <button class="toggle-btn" id="btn-mock" onclick="toggleMock()">📝 模擬考</button>
@@ -169,7 +170,7 @@
         </div>
         <div class="stat-box">
             <div style="display:flex; justify-content:space-between;">
-                <span class="stat-label">當前進度</span>
+                <span class="stat-label">作答完成度</span>
                 <span class="stat-label" id="progress-text">0/0</span>
             </div>
             <div class="progress-container">
@@ -215,38 +216,40 @@
             <button class="backup-btn" onclick="exportData()">💾 匯出進度</button>
             <button class="backup-btn" onclick="document.getElementById('import-file').click()">📂 匯入進度</button>
             <input type="file" id="import-file" style="display:none" onchange="importData(this)" accept=".json">
+            <button class="backup-btn" onclick="toggleDevImport()">🔧 開發者導入</button>
+        </div>
+        
+        <div class="import-zone" id="import-zone">
+            <div style="margin:10px 0; font-size:14px; color:var(--muted);">請貼上 JSON 格式題目 (自動容錯模式)：</div>
+            <textarea id="raw-input" placeholder='[{"q":"題目...", "o":["A","B"], "a":0, "c":"章節"}]'></textarea>
+            <div class="backup-btn-group">
+                <button class="backup-btn" onclick="processImport()" style="background:var(--success); color:white; border:none;">✅ 確認導入</button>
+                <button class="backup-btn" onclick="downloadNewJS()">📥 下載完整 JS 檔</button>
+            </div>
         </div>
     </div>
 </div>
 
 <script src="questions_data.js"></script>
 <script>
-    // --- 1. Service Worker 註冊 (啟動離線功能) ---
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('./service-worker.js')
-                .then(reg => console.log('Service Worker 註冊成功:', reg.scope))
-                .catch(err => console.log('Service Worker 註冊失敗:', err));
+                .then(reg => console.log('SW OK')).catch(err => console.log('SW Fail'));
         });
     }
 
-    // --- 2. 核心邏輯 ---
     let displayList = [], currentDisplayIndex = 0, userAnswers = [], wrongIndices = [], starredIndices = [];
-    let savedLastIndex = 0; // 暫存上次讀到的頁碼
+    let savedLastIndex = 0;
     let state = { isRandom: false, isMock: false, isReview: false, isStarMode: false, isSubmitted: false, filterText: "", filterCategory: "" };
 
     window.onload = function() {
         if (typeof questions === 'undefined') { alert("找不到題庫檔案 questions_data.js"); return; }
-        
-        initTheme(); // 載入主題
-        loadProgress(); // 載入進度
-        
-        if(userAnswers.length === 0) userAnswers = new Array(questions.length).fill(null);
-        initCategories();
-        
-        applyFilters(); 
-        
-        // 自動跳轉回上次的題目 (若是隨機模式則不跳轉)
+        initTheme(); loadProgress();
+        if(userAnswers.length < questions.length) {
+             userAnswers = userAnswers.concat(new Array(questions.length - userAnswers.length).fill(null));
+        }
+        initCategories(); applyFilters();
         if (savedLastIndex > 0 && savedLastIndex < displayList.length && !state.isRandom) {
             currentDisplayIndex = savedLastIndex;
             renderQuestion();
@@ -270,13 +273,7 @@
     }
 
     function saveProgress() {
-        const data = { 
-            ans: userAnswers, 
-            wrongs: wrongIndices, 
-            stars: starredIndices, 
-            lastIdx: currentDisplayIndex, 
-            timestamp: new Date().getTime() 
-        };
+        const data = { ans: userAnswers, wrongs: wrongIndices, stars: starredIndices, lastIdx: currentDisplayIndex, timestamp: new Date().getTime() };
         localStorage.setItem('civ_law_backup_save', JSON.stringify(data));
         updateStats(); 
     }
@@ -286,39 +283,101 @@
         if (saved) {
             try {
                 const d = JSON.parse(saved);
-                if(d.ans && d.ans.length === questions.length) userAnswers = d.ans;
+                if(d.ans) userAnswers = d.ans;
                 if(d.wrongs) wrongIndices = d.wrongs;
                 if(d.stars) starredIndices = d.stars;
                 if(d.lastIdx !== undefined) savedLastIndex = d.lastIdx;
-            } catch(e) { console.error("讀取失敗", e); }
+            } catch(e) {}
         }
     }
 
+    // --- 跳轉功能 ---
+    function jumpToQuestion() {
+        const val = parseInt(document.getElementById('jump-input').value);
+        if (!val || isNaN(val)) return;
+        const targetIndex = val - 1;
+        if (targetIndex < 0 || targetIndex >= questions.length) { alert("無此題號"); return; }
+
+        if (confirm(`跳轉到第 ${val} 題？(將重置篩選)`)) {
+             document.getElementById('search-input').value = "";
+             document.getElementById('category-filter').value = "";
+             document.getElementById('jump-input').value = "";
+             state.filterText = ""; state.filterCategory = "";
+             state.isRandom = false; state.isMock = false; state.isReview = false; state.isStarMode = false;
+             resetToggleUI();
+             applyFilters();
+             currentDisplayIndex = targetIndex;
+             renderQuestion(); saveProgress();
+        }
+    }
+
+    // --- 匯出匯入 ---
     function exportData() {
         const data = { ans: userAnswers, wrongs: wrongIndices, stars: starredIndices, date: new Date().toLocaleString() };
         const blob = new Blob([JSON.stringify(data)], {type: "application/json"});
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(blob);
-        a.download = `民訴題庫進度_${new Date().toISOString().slice(0,10)}.json`;
-        a.click();
+        const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
+        a.download = `民訴題庫進度_${new Date().toISOString().slice(0,10)}.json`; a.click();
     }
 
     function importData(input) {
-        const file = input.files[0];
-        if (!file) return;
+        const file = input.files[0]; if (!file) return;
         const reader = new FileReader();
         reader.onload = function(e) {
             try {
                 const d = JSON.parse(e.target.result);
-                if (confirm(`確定要匯入備份嗎？\n備份日期: ${d.date || '未知'}`)) {
+                if (confirm(`匯入備份 (日期: ${d.date || '未知'})？`)) {
                     if(d.ans) userAnswers = d.ans;
                     if(d.wrongs) wrongIndices = d.wrongs;
                     if(d.stars) starredIndices = d.stars;
+                    if(userAnswers.length < questions.length) {
+                        userAnswers = userAnswers.concat(new Array(questions.length - userAnswers.length).fill(null));
+                    }
                     saveProgress(); applyFilters(); alert("匯入成功！");
                 }
-            } catch (err) { alert("檔案格式錯誤"); }
-        };
-        reader.readAsText(file); input.value = '';
+            } catch (err) { alert("格式錯誤"); }
+        }; reader.readAsText(file); input.value = '';
+    }
+
+    // --- 開發者導入功能 (修正版：解決 const 錯誤) ---
+    function toggleDevImport() {
+        const zone = document.getElementById('import-zone');
+        zone.style.display = zone.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function processImport() {
+        const input = document.getElementById('raw-input').value.trim();
+        if (!input) return;
+        try {
+            // 核心修正：參考您的檔案，強制剝除外殼與尾部逗號
+            let clean = input.replace(/^\[/, '').replace(/\]$/, '').replace(/,$/, '');
+            // 重新包裝成標準 JSON
+            const newBatch = JSON.parse(`[${clean}]`);
+            
+            // 核心修正：使用 push 而非重新賦值，避免 Assignment to constant 錯誤
+            questions.push(...newBatch);
+            
+            // 擴充 userAnswers
+            userAnswers = userAnswers.concat(new Array(newBatch.length).fill(null));
+            
+            // 更新 UI
+            initCategories(); 
+            applyFilters();
+            
+            alert(`✅ 成功導入 ${newBatch.length} 題！\n目前總題數：${questions.length}`);
+            document.getElementById('raw-input').value = "";
+            
+        } catch (e) {
+            alert(`❌ 解析失敗！\n錯誤：${e.message}\n請確認您的 JSON 格式。`);
+        }
+    }
+
+    function downloadNewJS() {
+        const content = "const questions = " + JSON.stringify(questions, null, 2) + ";";
+        const blob = new Blob([content], {type: "text/javascript"});
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "questions_data_updated.js";
+        a.click();
     }
 
     function toggleCurrentStar() {
@@ -330,7 +389,7 @@
     }
 
     function toggleStarMode() {
-        if (starredIndices.length === 0) { alert("目前沒有收藏任何題目！"); return; }
+        if (starredIndices.length === 0) { alert("無收藏題目"); return; }
         state.isStarMode = !state.isStarMode;
         document.getElementById('btn-star').classList.toggle('star-active');
         if (state.isStarMode) { state.isReview = false; state.isMock = false; resetToggleUI(); }
@@ -338,30 +397,43 @@
     }
 
     function updateStats() {
-        let totalAnswered = 0, totalCorrect = 0;
+        let totalAnsweredGlobal = 0, totalCorrectGlobal = 0;
         userAnswers.forEach((ans, i) => {
-            if (ans !== null) { totalAnswered++; if (ans === questions[i].a) totalCorrect++; }
+            if (ans !== null && questions[i]) { 
+                totalAnsweredGlobal++; 
+                if (ans === questions[i].a) totalCorrectGlobal++; 
+            }
         });
-        const accuracy = totalAnswered === 0 ? 0 : Math.round((totalCorrect / totalAnswered) * 100);
+        const accuracy = totalAnsweredGlobal === 0 ? 0 : Math.round((totalCorrectGlobal / totalAnsweredGlobal) * 100);
         document.getElementById('accuracy-text').innerText = `${accuracy}%`;
         
-        document.getElementById('progress-text').innerText = `${currentDisplayIndex + 1} / ${displayList.length}`;
-        const pct = displayList.length > 0 ? ((currentDisplayIndex + 1) / displayList.length) * 100 : 0;
+        let currentListAnswered = 0;
+        displayList.forEach(realIdx => {
+            if (userAnswers[realIdx] !== null) currentListAnswered++;
+        });
+
+        const totalInList = displayList.length;
+        const pct = totalInList > 0 ? (currentListAnswered / totalInList) * 100 : 0;
+        
         document.getElementById('progress-bar').style.width = `${pct}%`;
+        document.getElementById('progress-text').innerText = `${currentListAnswered} / ${totalInList}`;
+        
         document.getElementById('wrong-count').innerText = wrongIndices.length;
         document.getElementById('star-count').innerText = starredIndices.length;
     }
 
     function initCategories() {
         const select = document.getElementById('category-filter');
+        const currentVal = select.value;
+        select.innerHTML = '<option value="">📂 所有章節</option>';
         const categories = [...new Set(questions.map(q => q.c))];
         categories.forEach(c => {
             const opt = document.createElement('option'); opt.value = c; opt.innerText = c; select.appendChild(opt);
         });
+        if (categories.includes(currentVal)) select.value = currentVal;
     }
 
     function applyFilters() {
-        // [修復] 讀取下拉選單的值
         state.filterCategory = document.getElementById('category-filter').value;
 
         let basePool = questions.map((_, i) => i);
@@ -377,9 +449,7 @@
 
         if (state.isRandom) shuffleArray(displayList); else displayList.sort((a, b) => a - b);
         
-        // 預設重置為0 (如果不是剛載入的自動跳轉，使用者切換條件時應回到第一題)
         currentDisplayIndex = 0; 
-        
         if (state.isMock) { state.isSubmitted = false; document.getElementById('score-display').style.display = 'none'; document.getElementById('btn-submit').style.display = 'inline-block'; }
         renderQuestion(); updateStats();
     }
@@ -425,7 +495,7 @@
         const fbArea = document.getElementById('feedback-area');
         if (showExp) { document.getElementById('q-exp').innerText = qData.e || "暫無詳細解析"; fbArea.classList.add('show'); hintBtn.style.display = 'none'; } 
         else fbArea.classList.remove('show');
-        updateStats();
+        updateStats(); 
     }
 
     function handleAnswer(qIdx, ansIdx) {
